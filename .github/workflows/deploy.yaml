@@ -28,8 +28,14 @@ jobs:
       - name: Install Dependencies
         run: npm install
 
-      - name: Build
-        run: npm run build
+      - name: Rewrite Service Worker Path in Index
+        run: sed -i 's@/sw.js@${{ github.event.repository.name }}/sw.js@g' ./index.html && cat ./index.html
+
+      - name: Replace Paths in Manifest
+        run: sed -i 's@"/"@"/${{ github.event.repository.name }}/"@g' ./public/manifest.json && cat ./public/manifest.json
+
+      - name: Vite Build
+        run: npm run build -- --base=${{ github.event.repository.name }}
 
       - name: Upload Artifact
         uses: actions/upload-pages-artifact@v1
