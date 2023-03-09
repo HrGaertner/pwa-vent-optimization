@@ -1,0 +1,41 @@
+{
+"name": "Lüftungsoptimierung",
+"short_name": "Lüftungsoptimierung",
+"start_url": "/",
+"display": "standalone",
+"description": "A convienient webapp to optimize venting",
+"lang": " de-DE",
+"dir": "auto",
+"theme_color": "#000000",
+"background_color": "#000000",
+"orientation": "any",
+"icons": [
+    {
+        "src": "/favicons/512x512.png",
+        "sizes": "512x512",
+        "type": "image/png",
+        "purpose": "maskable"
+    },
+    {
+        "src": "/favicons/192x192.png",
+        "sizes": "192x192",
+        "type": "image/png",
+        "purpose": "any"
+    }
+],
+"screenshots": [
+    {
+        "src": "https://www.pwabuilder.com/assets/screenshots/screen1.png",
+        "sizes": "2880x1800",
+        "type": "image/png",
+        "description": "A screenshot of the home page"
+    }
+],
+"shortcuts": [
+    {
+        "name":"Lüftungsoptimierung",
+        "url":"/index.html",
+        "description":"Shortcut to a convienient webapp to optimize venting"
+    }
+]
+}
