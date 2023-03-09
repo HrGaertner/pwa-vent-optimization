@@ -6,8 +6,8 @@
   "author": "Jonathan Gärtner",
   "license": "Apache-2.0",
   "dependencies": {
-    "pwainstall": "^1.6.7",
-    "router": "^1.7.4",
+    "@pwabuilder/pwainstall": "^1.6.7",
+    "@vaadin/router": "^1.7.4",
     "bulma": "^0.9.4",
     "chartist": "^1.3.0",
     "fmin": "^0.0.2",
