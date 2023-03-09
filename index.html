@@ -32,7 +32,7 @@
 
     <div class="section pages" id="page1">
         <div class="container">
-            <div class="field" style="max-width: 30em;">
+            <div class="field columns is-mobile" style="max-width: 50em;">
                 <div class="control"><label><input class="input" placeholder="Luftfeuchtigkeit" id="h0"
                             type="number"></label></div>
                 <div class="control"><label><input class="input" placeholder="Temperatur" id="t0" type="number"></label>
@@ -43,11 +43,13 @@
                             id="calculate-model"></label></div>
             </div>
         </div>
-        <div class="full-width-form" id="f_weather" style="display: none;">
+        <div class="container">
+        <div class="field columns is-mobile" id="f_weather" style="display: none;">
             <br>
             <p>Wetterdaten</p>
-            <div class="col"><label><input placeholder="Luftfeuchtigkeit" id="h_out" type="number"></label></div>
-            <div class="col"><label><input placeholder="Temperatur" id="t_out" type="number"></label></div>
+            <div class="control"><label><input class="input" placeholder="Luftfeuchtigkeit" id="h_out" type="number"></label></div>
+            <div class="control"><label><input class="input" placeholder="Temperatur" id="t_out" type="number"></label></div>
+        </div>
         </div>
         <br>
         <div class="vent ct-octave box" style="max-width: 51em"></div>

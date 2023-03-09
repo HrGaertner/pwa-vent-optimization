@@ -17,7 +17,6 @@ Array.from(pages).forEach(function(page) {
   });
 
 function menu(){
-    console.log("test");
     var pages = document.getElementsByClassName("pages");
     for (let pag = 0; pag<pages.length;pag++){
         pages[pag].style.display = "none";
@@ -27,7 +26,6 @@ function menu(){
         page_changers[changer].classList.remove("is-active");
     }
     
-    console.log("page"+this.id);
     var new_page = document.getElementById("page"+this.id);
     new_page.style.display = "block";
     this.classList.add("is-active");
