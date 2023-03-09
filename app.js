@@ -2,9 +2,9 @@ import "chartist/dist/index.css";
 import 'bulma/css/bulma.css'
 import { LineChart, AutoScaleAxis } from "chartist";
 
-if (localStorage[room-size] === null || localStorage["window-size"] === null){
+if (localStorage["room-size"] === undefined || localStorage["window-size"] === undefined){
     document.getElementById("welcome-notice").style.display = "block";
-    menu.call(getElementById("3"));
+    menu.call(document.getElementById("3"));
 }
 
 if (localStorage["constants_vent"] === null){
@@ -21,6 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {//by https://bulma.io/docum
     });
   });
 
+  document.getElementById("standard-button").addEventListener("click", set_defaults);
 function set_defaults() {
     localStorage["constants_vent"] = JSON.stringify([49.9737675 ,  2.28452262, 49.3679433 ,  8.39747826]);
 }
@@ -46,7 +47,8 @@ function menu(){
 
 }
 
-document.getElementById('own-weatherdata').addEventListener('change', (function() {toggle_element_vis("f_weather")}));
+document.getElementById('own-weatherdata').addEventListener('change', (function() {toggle_element_vis("f_weather1")}));
+document.getElementById('current_data').addEventListener('change', (function() {toggle_element_vis("f_weather2")}));
 
 function toggle_element_vis(elem){
     var x = document.getElementById(elem);
@@ -122,6 +124,10 @@ function get_weather_data() {
 	}
 	return parseFloat(item.value)
 }
+
+
+document.getElementById('export-button').addEventListener('click', (function(){this.href = 'data:application/json,' + JSON.stringify(localStorage);}));
+document.getElementById('setting-import').addEventListener('click', (function(){const selectedFile = this.files[0];import_settings(selectedFile);}));
 
 function import_settings(File) {
     read = new FileReader();
@@ -226,6 +232,8 @@ function insertAfter(referenceNode, newNode) {// by https://stackoverflow.com/qu
     referenceNode.parentNode.insertBefore(newNode, referenceNode.nextSibling);
   }
 
+
+document.getElementById('new_datapoint_button').addEventListener('click', new_datapoint);
 var current_datapoint = 1;
 
 function new_datapoint(){//function to add a new datapoint input to the train page
@@ -248,6 +256,7 @@ function new_datapoint(){//function to add a new datapoint input to the train pa
     current_datapoint += 1;
 }
 
+document.getElementById('train_model').addEventListener('click', train);
 function train(){
     //getting the data from the inputs
     temperature = document.getElementById("T_0").value;
@@ -275,3 +284,13 @@ function train(){
 
     alert("Das Modell wurde angepasst");
 };
+
+document.getElementById('save-settings').addEventListener('click', save_settings);
+function save_settings(){
+    localStorage['window-size'] = document.getElementById('window-size').value;
+    localStorage['room-size'] = document.getElementById('room-size').value;
+    localStorage['lat'] = document.getElementById('lat').value;
+    localStorage['lon'] = document.getElementById('long').value;
+}
+
+document.getElementById('update-button').addEventListener('click', (function(){serviceWorkerRegistration.update()}));
