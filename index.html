@@ -11,23 +11,17 @@
 </head>
 
 <body>
-    <div class="tabs is-toggle is-fullwidth is-medium" style="margin-top: 0;">
+    <div class="tabs is-toggle is-fullwidth is-medium">
         <ul>
             <li id="1" class="is-active page-changer"><a>Vorhersage</a></li>
             <li id="2" class="page-changer"><a>Training</a></li>
             <li id="3" class="page-changer"><a>Einstellungen</a></li>
         </ul>
     </div>
-    <!-- Only shwo the following notice if local storage is empty -->
-    <div class="row notice" id="welcome-notice" style="display: none">
-        <div class="section">
-            <div class="notice-message">
-                <div class="notice-text">Bitte legen sie zuerst die Basisparameter unter Einstellungen fest.</div>
-                <div class="notice-dismiss" onclick="document.getElementById('welcome-notice').remove();">
-                    <img src="icons/close-outline.svg" alt="Icon close outline">
-                </div>
-            </div>
-        </div>
+    <!-- Only show the following notice if room volume or windows size is not defined -->
+    <div class="notification is-danger is-light" style="display: none;" id="welcome-notice">
+        <button class="delete"></button>
+        Sie haben noch kein Raumvolumen bzw. Fenstergröße festgelegt. <strong>Diese Daten werden für das Modell benötigt</strong>. Bitte fügen sie diese Informationen in den Einstellungen hinzu.
     </div>
 
     <div class="section pages" id="page1">

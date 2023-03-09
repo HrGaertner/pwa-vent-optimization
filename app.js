@@ -2,10 +2,24 @@ import "chartist/dist/index.css";
 import 'bulma/css/bulma.css'
 import { LineChart, AutoScaleAxis } from "chartist";
 
-if (localStorage.length == 0){
+if (localStorage[room-size] === null || localStorage["window-size"] === null){
     document.getElementById("welcome-notice").style.display = "block";
+    menu.call(getElementById("3"));
+}
+
+if (localStorage["constants_vent"] === null){
     set_defaults();
 }
+
+document.addEventListener('DOMContentLoaded', () => {//by https://bulma.io/documentation/elements/notification/#javascript-example
+    (document.querySelectorAll('.notification .delete') || []).forEach(($delete) => {
+      const $notification = $delete.parentNode;
+  
+      $delete.addEventListener('click', () => {
+        $notification.parentNode.removeChild($notification);
+      });
+    });
+  });
 
 function set_defaults() {
     localStorage["constants_vent"] = JSON.stringify([49.9737675 ,  2.28452262, 49.3679433 ,  8.39747826]);
