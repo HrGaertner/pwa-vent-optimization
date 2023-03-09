@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Lüftungsoptimierung</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+
+<body>
+    <div class="tabs is-toggle is-fullwidth is-medium" style="margin-top: 0;">
+        <ul>
+            <li id="1" class="is-active page-changer"><a>Vorhersage</a></li>
+            <li id="2" class="page-changer"><a>Training</a></li>
+            <li id="3" class="page-changer"><a>Einstellungen</a></li>
+        </ul>
+    </div>
+    <!-- Only shwo the following notice if local storage is empty -->
+    <div class="row notice" id="welcome-notice" style="display: none">
+        <div class="section">
+            <div class="notice-message">
+                <div class="notice-text">Bitte legen sie zuerst die Basisparameter unter Einstellungen fest.</div>
+                <div class="notice-dismiss" onclick="document.getElementById('welcome-notice').remove();">
+                    <img src="icons/close-outline.svg" alt="Icon close outline">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section pages" id="page1">
+        <div class="container">
+            <div class="field" style="max-width: 30em;">
+                <div class="control"><label><input class="input" placeholder="Luftfeuchtigkeit" id="h0"
+                            type="number"></label></div>
+                <div class="control"><label><input class="input" placeholder="Temperatur" id="t0" type="number"></label>
+                </div>
+                <div class="control"><label><input class="checkbox" type="checkbox" id="own-weatherdata"> Eigene
+                        Wetterdaten nutzen </label></div>
+                <div class="control"><label><input class="button" type="submit" value="Berechnen"
+                            id="calculate-model"></label></div>
+            </div>
+        </div>
+        <div class="full-width-form" id="f_weather" style="display: none;">
+            <br>
+            <p>Wetterdaten</p>
+            <div class="col"><label><input placeholder="Luftfeuchtigkeit" id="h_out" type="number"></label></div>
+            <div class="col"><label><input placeholder="Temperatur" id="t_out" type="number"></label></div>
+        </div>
+        <br>
+        <div class="vent ct-octave box" style="max-width: 51em"></div>
+        <p>x-Achse: Zeit in Minuten | y-Achse: relative Luftfeuchtigkeit in %</p>
+        <p id="vent_time"></p>
+    </div>
+    <div class="section pages" id="page2" style="display: none;">
+        <p>Bitte beachten Sie, wenn Sie die Website schließen ohne das Modell vorher zu trainieren gehen ihre Eingaben verloren</p>
+        <p>Bitte pro Training nur ein Duschgang, dann wird der erste Eintrag als h0 bzw. t0 gehandhabt</p>
+        <div class="section">
+            <div class="row">
+            <div class="full-width-form">
+                <div class="col"><label><input placeholder="Temperatur" id="T_0" type="number"></label></div>
+                <hr>
+                <div class="row" id="datapoint0">
+                    <div class="col"><label><input placeholder="Minuten seit Start" id="t_0" type="number"></label>
+                    </div>
+                    <div class="col"><label><input placeholder="Luftfeuchtigkeit" id="h_0" type="number"></label>
+                    </div>
+                    <hr>
+                </div>
+                    <label><input checked="" id="current_data" type="checkbox" onclick="toggle_element_vis('f_weather')">Aktuelle Außendaten verwenden</label>
+                    <label><input checked="" id="keep_data" type="checkbox">Daten aus den vorherigen Zeilen für
+                        geringere Arbeit übernehmen</label>
+            </div>
+            </div>
+            <div class="full-width-form" id="f_weather" style="display: none;">
+                <p>Wetterdaten</p>
+                <div class="col"><label><input onchange="setWithExpiry('h_out', document.getElementById('h_out').value)" placeholder="Luftfeuchtigkeit" id="h_out" type="number"></label></div>
+                <div class="col"><label><input onchange="localStorage['t_out'] = document.getElementById('t_out').value" placeholder="Temperatur" id="t_out" type="number"></label></div>
+            </div>
+            <div class="row">
+                <p><a href="#" class="btn small round gray-dark" id="new_datapoint_button" onclick="new_datapoint();">Neue Datenzeile</a></p>
+                <p><a href="#" class="btn small round gray-dark" onclick="train()">Modell trainieren</a></p>
+            </div>
+        </div>
+    </div>
+    <div class="section pages" id="page3" style="display: none;">
+        <div class="section">
+            <div class="row">
+                <p>Die Koordinaten können sie bspw. <a href="https://www.latlong.net">hier</a> bekommen</p>
+                <div class="full-width-form">
+                    <div class="col"><label><input placeholder="Maximale Fensterfläche (m²)" id="window-size"
+                                type="number"></label>
+                    </div>
+                    <div class="col"><label><input placeholder="Raumvolumen (m³)" id="room-size" type="number"></label>
+                    </div>
+                    <div class="col"><label><input placeholder="Längengrad" id="long" type="number"></label></div>
+                    <div class="col"><label><input placeholder="Breitengrad" id="lat" type="number"></label></div>
+                    <div class="col"><label><input class="btn" type="submit" value="Speichern"
+                                onclick="localStorage['window-size'] = document.getElementById('window-size').value; localStorage['room-size'] = document.getElementById('room-size').value;localStorage['lat'] = document.getElementById('lat').value;localStorage['lon'] = document.getElementById('long').value;"></label>
+                    </div>
+                </div>
+            </div>
+            <script>
+                document.getElementById('window-size').value = localStorage['window-size'];
+                document.getElementById('room-size').value = localStorage['room-size']
+                document.getElementById('lat').value = localStorage['lat']
+                document.getElementById('long').value = localStorage['lon']
+            </script>
+            <div class="row">
+                <div class="col">
+                    <!-- Settings export-restore section-->
+                    <p><a href="#" class="btn small round gray-dark" download="vent-export.json"
+                            onclick="this.href = 'data:application/json,' + escape(JSON.stringify(localStorage));">Exportieren</a>
+                    </p>
+                    <label for="setting-import" class="btn small round gray-dark">Importieren</label>
+                    <input id="setting-import" type="file" accept=".json" style="display: none;"
+                        onchange="const selectedFile = this.files[0];import_settings(selectedFile);">
+                </div>
+                <div class="col">
+                    <p><a href="#" class="btn small round gray-dark"
+                            onclick="serviceWorkerRegistration.update();">Update</a></p>
+                </div>
+                <div class="col">
+                    <p><a href="#" class="btn small round gray-dark" onclick="set_defaults();">Standard
+                            wiederherstellen</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+        <div class="section">
+            <div class="row">
+                <h2>Wetterdaten</h2>
+                <p>Daten vom "The Norwegian Meteorological Institute" lizensiert unter lizensiert unter</p>
+                <a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons-lisens"
+                        style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/88x31.png" /></a>
+
+            </div>
+        </div>
+    </div>
+    <script type="module" src="./app.js"></script>
+</body>
+
+</html>
