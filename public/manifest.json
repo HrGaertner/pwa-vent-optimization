@@ -11,13 +11,13 @@
 "orientation": "any",
 "icons": [
     {
-        "src": "/favicons/512x512.png",
+        "src": "./favicons/512x512.png",
         "sizes": "512x512",
         "type": "image/png",
         "purpose": "maskable"
     },
     {
-        "src": "/favicons/192x192.png",
+        "src": "./favicons/192x192.png",
         "sizes": "192x192",
         "type": "image/png",
         "purpose": "any"
@@ -34,7 +34,7 @@
 "shortcuts": [
     {
         "name":"Lüftungsoptimierung",
-        "url":"/index.html",
+        "url":"./",
         "description":"Shortcut to a convienient webapp to optimize venting"
     }
 ]
