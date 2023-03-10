@@ -4,6 +4,35 @@ import { nelderMead } from "fmin";
 import { LineChart, AutoScaleAxis } from "chartist";
 
 
+let deferredPrompt;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+    // Prevent the mini-infobar from appearing on mobile
+    e.preventDefault();
+    // Stash the event so it can be triggered later.
+    deferredPrompt = e;
+    // Update UI notify the user they can install the PWA
+    document.getElementById("install-notice").style.display = "block";
+    // Optionally, send analytics event that PWA install promo was shown.
+    console.log(`'beforeinstallprompt' event was fired.`);
+});
+
+document.getElementById("install-button1").addEventListener('click', install);
+document.getElementById("install-button2").addEventListener('click', install);
+
+async function install(event) {
+    // Hide the app provided install promotion
+    document.getElementById("install-notice").style.display = "none";
+    // Show the install prompt
+    deferredPrompt.prompt();
+    // Wait for the user to respond to the prompt
+    const { outcome } = await deferredPrompt.userChoice;
+    // Optionally, send analytics event with outcome of user choice
+    console.log(`User response to the install prompt: ${outcome}`);
+    // We've used the prompt, and can't use it again, throw it away
+    deferredPrompt = null;
+}
+
 if (localStorage["room-size"] === undefined || localStorage["window-size"] === undefined){
     document.getElementById("welcome-notice").style.display = "block";
     menu.call(document.getElementById("3"));
