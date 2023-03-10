@@ -25,6 +25,26 @@
             Sie haben noch kein Raumvolumen bzw. Fenstergröße festgelegt. <strong>Diese Daten werden für das Modell
                 benötigt</strong>. Bitte fügen sie diese Informationen in den Einstellungen hinzu.
         </div>
+        <!-- Already below 70%-->
+        <div class="notification is-success is-light" style="display: none;" id="already_reached">
+            <button class="delete"></button>
+            Die Luftfeuchtigkeit ist bereits <strong>unter 70%</strong>. Es besteht keine Schimmelgefahr.
+        </div>
+        <!-- model trained -->
+        <div class="notification is-success is-light" style="display: none;" id="model-trained">
+            <button class="delete"></button>
+            Das Modell wurde <strong>erfolgreich</strong> an die lokale Situation angepasst.
+        </div>
+        <!--No values given (humidity, temperature)-->
+        <div class="notification is-danger is-light" style="display: none;" id="no-values">
+            <button class="delete"></button>
+            Alle Eingaben müssen <strong>ausgefüllt</strong> sein und in <strong>validen</strong> Bereichen liegen.
+        </div>
+        <!-- No weather data-->
+        <div class="notification is-danger is-light" style="display: none;" id="weather-missing">
+            <button class="delete"></button>
+            Es konnten keine Wetterdaten abgerufen werden, wurden <strong>Koordinaten</strong> festgelegt? Sind Sie mit dem <strong>Internet</strong> verbunden? Sie können auch <strong>eigene Wetterdaten</strong> festlegen
+        </div>
 
         <div class="section pages" id="page1">
             <div class="container" style="max-width: 50em;">
@@ -87,8 +107,8 @@
                     <h2 style="margin-bottom: 1em;" class="subtitle">Wetterdaten</h2>
                     <div class="columns is-mobile">
                         <div class="control" style="margin-right: 5px;"><label><input class="input"
-                                    placeholder="Luftfeuchtigkeit" id="h_out" type="number"></label></div>
-                        <div class="control"><label><input class="input" placeholder="Temperatur" id="t_out"
+                                    placeholder="Luftfeuchtigkeit" id="h_out1" type="number"></label></div>
+                        <div class="control"><label><input class="input" placeholder="Temperatur" id="t_out1"
                                     type="number"></label></div>
                     </div>
                 </div>
@@ -99,22 +119,21 @@
                 </div>
             </div>
         </div>
-        <div class="pages" id="page3" style="display: none;">
+        <div class="section pages" id="page3" style="display: none;">
             <div class="container" style="max-width: 50em;">
-            <div class="section">
                     <p>Die Koordinaten können sie bspw. <strong><a href="https://www.latlong.net">hier</a></strong> bekommen</p>
                     <hr>
                     <div class="field">
-                        <div class="columns is-mobile">
-                        <div class="control"><label><input class="input" placeholder="Fensterfläche, maximal (m²)" id="window-size"
+                        <div class="columns is-desktop">
+                        <div class="control" style="margin-right: 5px; margin-top: 5px;"><label><input class="input" placeholder="Fensterfläche, maximal (m²)" id="window-size"
                                     type="number"></label>
                         </div>
-                        <div class="control"><label><input class="input" placeholder="Raumvolumen (m³)" id="room-size"
+                        <div class="control" style="margin-right: 5px; margin-top: 5px;"><label><input class="input" placeholder="Raumvolumen (m³)" id="room-size"
                                     type="number"></label>
                         </div>
-                        <div class="control"><label><input class="input" placeholder="Längengrad" id="long" type="number"></label></div>
-                        <div class="control"><label><input class="input" placeholder="Breitengrad" id="lat" type="number"></label></div>
-                        <div class="control"><label><input class="button" type="submit" value="Speichern" id="save-settings"></label>
+                        <div class="control" style="margin-right: 5px; margin-top: 5px;"><label><input class="input" placeholder="Längengrad" id="long" type="number"></label></div>
+                        <div class="control" style="margin-right: 5px; margin-top: 5px;"><label><input class="input" placeholder="Breitengrad" id="lat" type="number"></label></div>
+                        <div class="control" style="margin-top: 5px;"><label><input class="button" type="submit" value="Speichern" id="save-settings"></label>
                         </div>
                     </div>
                     </div>
@@ -124,13 +143,28 @@
                     document.getElementById('room-size').value = localStorage['room-size']
                     document.getElementById('lat').value = localStorage['lat']
                     document.getElementById('long').value = localStorage['lon']
+
+                    function import_settings(File) {
+                        console.log(File);
+                        var read = new FileReader();
+                        read.addEventListener('load', (function(){
+                            var json_data = JSON.parse(read.result);
+                            for (var key in json_data) {
+                                console.log(key);
+                                console.log(json_data[key]);
+                                localStorage[key] = json_data[key];
+                            };
+                        }))
+                        read.readAsBinaryString(File);    
+                    }
                 </script>
                     <div class="columns is-mobile">
                         <!-- Settings export-restore section-->
                         <p style="margin-right: 5px;"><a href="#" class="button is-small is-rounded is-dark" download="vent-export.json" id="export-button">Exportieren</a>
                         </p>
                         <label for="setting-import" class="button is-small is-rounded is-dark">Importieren</label>
-                        <input id="setting-import" type="file" accept=".json" style="display: none;">
+                <input id="setting-import" type="file" accept=".json" style="display: none;"
+                    onchange="const selectedFile = this.files[0];import_settings(selectedFile);">
                     </div>
                     <hr>
                     <div class="columns is-mobile">
@@ -139,7 +173,6 @@
                                 wiederherstellen</a>
                         </p>
                     </div>
-                </div>
             <div class="section">
                     <h2 class="subtitle">Wetterdaten</h2>
                     <p>Daten vom "The Norwegian Meteorological Institute" lizensiert unter lizensiert unter</p>

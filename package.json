@@ -1,6 +1,6 @@
 {
   "name": "pwa-vent-optimization",
-  "version": "0.0.1",
+  "version": "0.9.0",
   "description": "A Webapp to conviently use the vent-optimization model",
   "main": "app.js",
   "author": "Jonathan Gärtner",
