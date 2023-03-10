@@ -1,6 +1,8 @@
 import "chartist/dist/index.css";
 import 'bulma/css/bulma.css'
+import { nelderMead } from "fmin";
 import { LineChart, AutoScaleAxis } from "chartist";
+
 
 if (localStorage["room-size"] === undefined || localStorage["window-size"] === undefined){
     document.getElementById("welcome-notice").style.display = "block";
@@ -16,7 +18,7 @@ document.addEventListener('DOMContentLoaded', () => {//by https://bulma.io/docum
       const $notification = $delete.parentNode;
   
       $delete.addEventListener('click', () => {
-        $notification.parentNode.removeChild($notification);
+        $notification.style.display = "none";
       });
     });
   });
@@ -61,7 +63,7 @@ function toggle_element_vis(elem){
 
 function fetch_met_no_and_cache(){ //To fetch the weather data from the internet
     if (! localStorage.getItem("lat") || !localStorage.getItem("lon")){
-        alert("Bitte geben Sie ihren Standort in den Einstellungen für die Wetterdaten ein.");
+        document.getElementById("weather-missing").style.display="block";
         throw new Error("Can not get weather data!")
         return
     }
@@ -91,6 +93,8 @@ function fetch_met_no_and_cache(){ //To fetch the weather data from the internet
 
 document.getElementById("t_out").addEventListener("change", (function(event){localStorage['t_out'] = this.value}))
 document.getElementById("h_out").addEventListener("change", (function(event){setWithExpiry('h_out', this.value)}));
+document.getElementById("t_out1").addEventListener("change", (function(event){localStorage['t_out'] = this.value}))
+document.getElementById("h_out1").addEventListener("change", (function(event){setWithExpiry('h_out', this.value)}));
 //To comply with the terms of met.no one has to cache the values to reduce load on their servers. The following two function do this while assuring to get new data if necessary
 //The concept of the following two function comes from https://www.sohamkamani.com/blog/javascript-localstorage-with-ttl-expiry/
 function setWithExpiry(key, value, ttl=3600000) {
@@ -126,17 +130,7 @@ function get_weather_data() {
 }
 
 
-document.getElementById('export-button').addEventListener('click', (function(){this.href = 'data:application/json,' + JSON.stringify(localStorage);}));
-document.getElementById('setting-import').addEventListener('click', (function(){const selectedFile = this.files[0];import_settings(selectedFile);}));
-
-function import_settings(File) {
-    read = new FileReader();
-    read.readAsBinaryString(File);
-    var json_data = JSON.parse(read.result);
-    for (var key in json_data) {
-        localstorage[key] = json_data[key];
-    };
-}
+document.getElementById('export-button').addEventListener('click', (function(){this.href = 'data:application/json,' + JSON.stringify(localStorage);}));//i deleted escape() here, but i think that is unrelated TODO
 
 function e_s(temperature){//The maximum absolute humidity by temperature
     var C_1 = 610.94 //Kp
@@ -199,9 +193,13 @@ document.getElementById('calculate-model').addEventListener('click', vent);
 function vent() {
     var t0 = parseFloat(document.getElementById('t0').value);
     var h0 = parseFloat(document.getElementById('h0').value);
+    if (t0 ===undefined ||t0===null||h0===undefined||h0===null){
+        document.getElementById("no-values").style.display="block";
+        throw Error("No values to process");
+    }
 
     if (h0 < 70){
-        alert("Zielbereich bereits erreicht.")
+        document.getElementById("already_reached").style.display =  "bold";
     }
 
     var h_out = get_weather_data()
@@ -259,30 +257,30 @@ function new_datapoint(){//function to add a new datapoint input to the train pa
 document.getElementById('train_model').addEventListener('click', train);
 function train(){
     //getting the data from the inputs
-    temperature = document.getElementById("T_0").value;
-    humidity = [];
-    local_time = [];
+    var temperature = document.getElementById("T_0").value;
+    var humidity = [];
+    var local_time = [];
 
     for (var i = 1; i < current_datapoint; i++){
-        current_x = []
+        var current_x = []
         var datapoint = document.getElementById("datapoint"+i);
         local_time.push(datapoint.childNodes[1].childNodes[0].childNodes[0].value);
         humidity.push(datapoint.childNodes[3].childNodes[0].childNodes[0].value);
     }
 
-    fnc = function(cons){//sum of error function
-        model_prediction = humidity_over_time_vent(humidity[0], temperature, localStorage["t_out"], get_weather_data(), cons);
-        sum = 0
+    var fnc = function(cons){//sum of error function
+        var model_prediction = humidity_over_time_vent(humidity[0], temperature, localStorage["t_out"], get_weather_data(), cons);
+        var sum = 0
         for (var i = 0; i < humidity.length; i++){
             sum += (model_prediction(local_time[i])-humidity[i])**2;
         };
         return sum;
     };
     //optimizing and storing back
-    var solution = fmin.nelderMead(fnc, JSON.parse(localStorage["constants_vent"]), {maxIterations:20});//Only change the constants slightly
+    var solution = nelderMead(fnc, JSON.parse(localStorage["constants_vent"]), {maxIterations:20});//Only change the constants slightly
     localStorage["constants_vent"] = JSON.stringify(solution["x"]);
 
-    alert("Das Modell wurde angepasst");
+    document.getElementById("model-trained").style.display = "block";
 };
 
 document.getElementById('save-settings').addEventListener('click', save_settings);
