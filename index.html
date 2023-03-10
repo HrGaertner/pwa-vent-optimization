@@ -19,6 +19,11 @@
                 <li id="3" class="page-changer"><a>Einstellungen</a></li>
             </ul>
         </div>
+        <div class="notification is-info" style="display: none;" id="install-notice">
+            <button class="delete"></button>
+            Sie können diese Website auch installieren und dann wie eine gewöhnliche App nutzen (auch offline).
+            <a id="install-button1" class="button is-success">Installieren</a>
+        </div>
         <!-- Only show the following notice if room volume or windows size is not defined -->
         <div class="notification is-danger is-light" style="display: none;" id="welcome-notice">
             <button class="delete"></button>
@@ -168,6 +173,7 @@
                     </div>
                     <hr>
                     <div class="columns is-mobile">
+                        <p style="margin-right: 5px;"><a href="#" class="button is-small is-rounded is-dark" id="install-button2">App installieren</a></p>
                         <p style="margin-right: 5px;"><a href="#" class="button is-small is-rounded is-dark" id="update-button">Update</a></p>
                         <p><a href="#" class="button is-small is-rounded is-dark" id="standard-button">Standard
                                 wiederherstellen</a>
