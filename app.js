@@ -3,6 +3,10 @@ import 'bulma/css/bulma.css'
 import { nelderMead } from "fmin";
 import { LineChart, AutoScaleAxis } from "chartist";
 
+if (window.matchMedia('(display-mode: standalone)').matches) {//https://stackoverflow.com/questions/41742390/javascript-to-check-if-pwa-or-mobile-web
+    document.getElementById("update-button").style.display = "block";
+  }
+
 
 let deferredPrompt;
 
@@ -13,6 +17,7 @@ window.addEventListener('beforeinstallprompt', (e) => {
     deferredPrompt = e;
     // Update UI notify the user they can install the PWA
     document.getElementById("install-notice").style.display = "block";
+    document.getElementById("install-button2").style.display = "block";
     // Optionally, send analytics event that PWA install promo was shown.
     console.log(`'beforeinstallprompt' event was fired.`);
 });
