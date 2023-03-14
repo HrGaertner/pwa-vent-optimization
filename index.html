@@ -21,8 +21,8 @@
         </div>
         <div class="notification is-info" style="display: none;" id="install-notice">
             <button class="delete"></button>
-            Sie können diese Website auch installieren und dann wie eine gewöhnliche App nutzen (auch offline).
-            <a id="install-button1" class="button is-success">Installieren</a>
+            <p>Sie können diese Website auch installieren und dann wie eine gewöhnliche App nutzen (auch offline).</p>
+            <a style="margin-top: 1em;" id="install-button1" class="button is-rounded is-dark is-small">Installieren</a>
         </div>
         <!-- Only show the following notice if room volume or windows size is not defined -->
         <div class="notification is-danger is-light" style="display: none;" id="welcome-notice">
@@ -48,7 +48,7 @@
         <!-- No weather data-->
         <div class="notification is-danger is-light" style="display: none;" id="weather-missing">
             <button class="delete"></button>
-            Es konnten keine Wetterdaten abgerufen werden, wurden <strong>Koordinaten</strong> festgelegt? Sind Sie mit dem <strong>Internet</strong> verbunden? Sie können auch <strong>eigene Wetterdaten</strong> festlegen
+            Es konnten keine Wetterdaten abgerufen werden, wurden <strong>Koordinaten</strong> festgelegt? Sind Sie mit dem <strong>Internet</strong> verbunden? Sie können auch <strong>eigene Wetterdaten</strong> festlegen.
         </div>
 
         <div class="section pages" id="page1">
@@ -79,7 +79,7 @@
                 <br>
                 <div class="vent ct-octave box" style="max-width: 51em"></div>
                 <p>x-Achse: Zeit in Minuten | y-Achse: relative Luftfeuchtigkeit in %</p>
-                <p id="vent_time"></p>
+                <h4 id="vent_time"></h4>
 
             </div>
         </div>
@@ -165,17 +165,17 @@
                 </script>
                     <div class="columns is-mobile">
                         <!-- Settings export-restore section-->
-                        <p style="margin-right: 5px;"><a href="#" class="button is-small is-rounded is-dark" download="vent-export.json" id="export-button">Exportieren</a>
+                        <p style="margin-right: 5px;"><a href="#" class="button is-medium is-rounded is-dark" download="vent-export.json" id="export-button">Exportieren</a>
                         </p>
-                        <label for="setting-import" class="button is-small is-rounded is-dark">Importieren</label>
+                        <label for="setting-import" class="button is-medium is-rounded is-dark">Importieren</label>
                 <input id="setting-import" type="file" accept=".json" style="display: none;"
                     onchange="const selectedFile = this.files[0];import_settings(selectedFile);">
                     </div>
                     <hr>
                     <div class="columns is-mobile">
-                        <p style="margin-right: 5px;"><a href="#" class="button is-small is-rounded is-dark" id="install-button2">App installieren</a></p>
-                        <p style="margin-right: 5px;"><a href="#" class="button is-small is-rounded is-dark" id="update-button">Update</a></p>
-                        <p><a href="#" class="button is-small is-rounded is-dark" id="standard-button">Standard
+                        <p style="margin-right: 5px;"><a style="display: none;" href="#" class="button is-medium is-rounded is-dark" id="install-button2">App installieren</a></p>
+                        <p style="margin-right: 5px;"><a href="#" style="display: none;" class="button is-medium is-rounded is-dark" id="update-button">Update</a></p>
+                        <p><a href="#" class="button is-medium is-rounded is-dark" id="standard-button">Standard
                                 wiederherstellen</a>
                         </p>
                     </div>

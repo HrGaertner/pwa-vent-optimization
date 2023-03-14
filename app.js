@@ -3,6 +3,10 @@ import 'bulma/css/bulma.css'
 import { nelderMead } from "fmin";
 import { LineChart, AutoScaleAxis } from "chartist";
 
+if (window.matchMedia('(display-mode: standalone)').matches) {//https://stackoverflow.com/questions/41742390/javascript-to-check-if-pwa-or-mobile-web
+    document.getElementById("update-button").style.display = "block";
+  }
+
 
 let deferredPrompt;
 
@@ -13,6 +17,7 @@ window.addEventListener('beforeinstallprompt', (e) => {
     deferredPrompt = e;
     // Update UI notify the user they can install the PWA
     document.getElementById("install-notice").style.display = "block";
+    document.getElementById("install-button2").style.display = "block";
     // Optionally, send analytics event that PWA install promo was shown.
     console.log(`'beforeinstallprompt' event was fired.`);
 });
@@ -20,7 +25,7 @@ window.addEventListener('beforeinstallprompt', (e) => {
 document.getElementById("install-button1").addEventListener('click', install);
 document.getElementById("install-button2").addEventListener('click', install);
 
-async function install(event) {
+async function install() {
     // Hide the app provided install promotion
     document.getElementById("install-notice").style.display = "none";
     // Show the install prompt
@@ -94,10 +99,9 @@ function fetch_met_no_and_cache(){ //To fetch the weather data from the internet
     if (! localStorage.getItem("lat") || !localStorage.getItem("lon")){
         document.getElementById("weather-missing").style.display="block";
         throw new Error("Can not get weather data!")
-        return
     }
-    lat = localStorage["lat"];
-    lon = localStorage["lon"];
+    var lat = localStorage["lat"];
+    var lon = localStorage["lon"];
 
     fetch('https://api.met.no/weatherapi/locationforecast/2.0/compact?lat='+lat+'&lon='+lon).then(response => {return response.json()})
     .then(response => {
@@ -120,10 +124,10 @@ function fetch_met_no_and_cache(){ //To fetch the weather data from the internet
 }
 
 
-document.getElementById("t_out").addEventListener("change", (function(event){localStorage['t_out'] = this.value}))
-document.getElementById("h_out").addEventListener("change", (function(event){setWithExpiry('h_out', this.value)}));
-document.getElementById("t_out1").addEventListener("change", (function(event){localStorage['t_out'] = this.value}))
-document.getElementById("h_out1").addEventListener("change", (function(event){setWithExpiry('h_out', this.value)}));
+document.getElementById("t_out").addEventListener("change", (function(){localStorage['t_out'] = this.value}))
+document.getElementById("h_out").addEventListener("change", (function(){setWithExpiry('h_out', this.value)}));
+document.getElementById("t_out1").addEventListener("change", (function(){localStorage['t_out'] = this.value}))
+document.getElementById("h_out1").addEventListener("change", (function(){setWithExpiry('h_out', this.value)}));
 //To comply with the terms of met.no one has to cache the values to reduce load on their servers. The following two function do this while assuring to get new data if necessary
 //The concept of the following two function comes from https://www.sohamkamani.com/blog/javascript-localstorage-with-ttl-expiry/
 function setWithExpiry(key, value, ttl=3600000) {
@@ -192,7 +196,7 @@ function humidity_over_time_vent(h0, t0, t_out0, h_out0, cons) {
     function vent_humidity(t) {// function only dependend from time for plotting etc.
         return to_relative(humidity_model(absolute, absolute_out, t, cons), temperature_model(t0, t_out0, t, cons));
 
-    };
+    }
     return vent_humidity
 }
 
@@ -265,7 +269,6 @@ var current_datapoint = 1;
 
 function new_datapoint(){//function to add a new datapoint input to the train page
     var keep_data = document.getElementById("keep_data").checked
-    var current_data = document.getElementById("current_data").checked
 
     var new_datapoint = document.getElementById("datapoint" + (current_datapoint-1)).cloneNode(true);
 
@@ -291,7 +294,6 @@ function train(){
     var local_time = [];
 
     for (var i = 1; i < current_datapoint; i++){
-        var current_x = []
         var datapoint = document.getElementById("datapoint"+i);
         local_time.push(datapoint.childNodes[1].childNodes[0].childNodes[0].value);
         humidity.push(datapoint.childNodes[3].childNodes[0].childNodes[0].value);
@@ -303,14 +305,14 @@ function train(){
         for (var i = 0; i < humidity.length; i++){
             sum += (model_prediction(local_time[i])-humidity[i])**2;
         };
-        return sum;
+        return sum
     };
     //optimizing and storing back
     var solution = nelderMead(fnc, JSON.parse(localStorage["constants_vent"]), {maxIterations:20});//Only change the constants slightly
     localStorage["constants_vent"] = JSON.stringify(solution["x"]);
 
     document.getElementById("model-trained").style.display = "block";
-};
+}
 
 document.getElementById('save-settings').addEventListener('click', save_settings);
 function save_settings(){

@@ -3,7 +3,7 @@
 "short_name": "Lüftungsoptimierung",
 "start_url": "/",
 "display": "standalone",
-"description": "A convienient webapp to optimize venting",
+"description": "Eine einfache App um das Lüften zu optimieren, so dass man das Schimmelrisiko minimiert, aber möglichst wenig Wärme verliert.",
 "lang": " de-DE",
 "dir": "auto",
 "theme_color": "#000000",
@@ -25,8 +25,8 @@
 ],
 "screenshots": [
     {
-        "src": "https://www.pwabuilder.com/assets/screenshots/screen1.png",
-        "sizes": "2880x1800",
+        "src": "screen.png",
+        "sizes": "1440x2880",
         "type": "image/png",
         "description": "A screenshot of the home page"
     }
