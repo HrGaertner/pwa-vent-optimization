@@ -95,7 +95,7 @@ function toggle_element_vis(elem){
     }
 }
 
-function fetch_met_no_and_cache(){ //To fetch the weather data from the internet
+async function fetch_met_no_and_cache(){ //To fetch the weather data from the internet
     if (! localStorage.getItem("lat") || !localStorage.getItem("lon")){
         document.getElementById("weather-missing").style.display = "block";
         throw new Error("Can not get weather data!")
@@ -103,7 +103,7 @@ function fetch_met_no_and_cache(){ //To fetch the weather data from the internet
     var lat = localStorage["lat"];
     var lon = localStorage["lon"];
 
-    fetch('https://api.met.no/weatherapi/locationforecast/2.0/compact?lat='+lat+'&lon='+lon).then(response => {return response.json()})
+    await fetch('https://api.met.no/weatherapi/locationforecast/2.0/compact?lat='+lat+'&lon='+lon).then(response => {return response.json()})
     .then(response => {
         var result = response["properties"]["timeseries"]
         var last_difference = Date.now();
@@ -142,11 +142,13 @@ function setWithExpiry(key, value, ttl=3600000) {
 	localStorage.setItem(key, JSON.stringify(item))
 }
 
-function get_weather_data() {
+async function get_weather_data() {
 	const itemStr = localStorage.getItem("h_out")
 	// if the item doesn't exist, return null
 	if (!itemStr) {
-		fetch_met_no_and_cache()
+		await fetch_met_no_and_cache()
+
+	    const itemStr = localStorage.getItem("h_out")
         return;
 	}
 	const item = JSON.parse(itemStr)
@@ -157,7 +159,7 @@ function get_weather_data() {
 		// and return null
 		localStorage.removeItem("h_out")
         localStorage.removeItem("t_out")
-		fetch_met_no_and_cache();
+		await fetch_met_no_and_cache();
 	}
 	return parseFloat(item.value)
 }
@@ -236,7 +238,7 @@ function check_hum(h0){
 }
 
 document.getElementById('calculate-model').addEventListener('click', vent);
-function vent() {
+async function vent() {
     var t0 = parseFloat(document.getElementById('t0').value);
     var h0 = parseFloat(document.getElementById('h0').value);
     check_temp(t0);
@@ -247,7 +249,7 @@ function vent() {
         document.getElementById("already_reached").style.display =  "bold";
     }
 
-    var h_out = get_weather_data()
+    var h_out = await get_weather_data()
 
     //plotting the graph
     var func = humidity_over_time_vent(h0, t0, parseFloat(localStorage["t_out"]), h_out, JSON.parse(localStorage["constants_vent"]));
@@ -299,7 +301,7 @@ function new_datapoint(){//function to add a new datapoint input to the train pa
 }
 
 document.getElementById('train_model').addEventListener('click', train);
-function train(){
+async function train(){
     //getting the data from the inputs
     var temperature = document.getElementById("T_0").value;
     var humidity = [];
@@ -310,9 +312,10 @@ function train(){
         local_time.push(datapoint.childNodes[1].childNodes[0].childNodes[0].value);
         humidity.push(datapoint.childNodes[3].childNodes[0].childNodes[0].value);
     }
+    await get_weather_data();
 
     var fnc = function(cons){//sum of error function
-        var model_prediction = humidity_over_time_vent(humidity[0], temperature, localStorage["t_out"], get_weather_data(), cons);
+        var model_prediction = humidity_over_time_vent(humidity[0], temperature, localStorage["t_out"], JSON.parse(localStorage["h_out"])["value"], cons);
         var sum = 0
         for (var i = 0; i < humidity.length; i++){
             sum += (model_prediction(local_time[i])-humidity[i])**2;
@@ -320,10 +323,7 @@ function train(){
         return sum
     };
     //optimizing and storing back
-    var solution = nelderMead(fnc, JSON.parse(localStorage["constants_vent"]), {maxIterations:20});//Only change the constants slightly
-    console.log(solution);
-    localStorage["constants_vent"] = JSON.stringify(solution["x"]);
-
+    localStorage["constants_vent"] = JSON.stringify(nelderMead(fnc, JSON.parse(localStorage["constants_vent"]), {maxIterations:15})["x"]);//Only change the constants slightly
     document.getElementById("model-trained").style.display = "block";
 }
 
