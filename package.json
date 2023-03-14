@@ -19,7 +19,7 @@
   "devDependencies": {
     "eslint": "^8.36.0",
     "sass": "^1.59.2",
-    "vite": "^2.9.15",
+    "vite": "^4.1.4",
     "vite-plugin-pwa": "^0.14.4"
   }
 }
