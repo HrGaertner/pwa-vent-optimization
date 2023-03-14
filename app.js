@@ -43,7 +43,7 @@ if (localStorage["room-size"] === undefined || localStorage["window-size"] === u
     menu.call(document.getElementById("3"));
 }
 
-if (localStorage["constants_vent"] === null){
+if (localStorage["constants_vent"] === null || localStorage["constants_vent"] === undefined){
     set_defaults();
 }
 
@@ -97,7 +97,7 @@ function toggle_element_vis(elem){
 
 function fetch_met_no_and_cache(){ //To fetch the weather data from the internet
     if (! localStorage.getItem("lat") || !localStorage.getItem("lon")){
-        document.getElementById("weather-missing").style.display="block";
+        document.getElementById("weather-missing").style.display = "block";
         throw new Error("Can not get weather data!")
     }
     var lat = localStorage["lat"];
@@ -124,10 +124,10 @@ function fetch_met_no_and_cache(){ //To fetch the weather data from the internet
 }
 
 
-document.getElementById("t_out").addEventListener("change", (function(){localStorage['t_out'] = this.value}))
-document.getElementById("h_out").addEventListener("change", (function(){setWithExpiry('h_out', this.value)}));
-document.getElementById("t_out1").addEventListener("change", (function(){localStorage['t_out'] = this.value}))
-document.getElementById("h_out1").addEventListener("change", (function(){setWithExpiry('h_out', this.value)}));
+document.getElementById("t_out").addEventListener("change", (function(){check_temp(this.value); localStorage['t_out'] = this.value}))
+document.getElementById("h_out").addEventListener("change", (function(){check_hum(this.value); setWithExpiry('h_out', this.value)}));
+document.getElementById("t_out1").addEventListener("change", (function(){check_temp(this.value); localStorage['t_out'] = this.value}))
+document.getElementById("h_out1").addEventListener("change", (function(){check_hum(this.value); setWithExpiry('h_out', this.value)}));
 //To comply with the terms of met.no one has to cache the values to reduce load on their servers. The following two function do this while assuring to get new data if necessary
 //The concept of the following two function comes from https://www.sohamkamani.com/blog/javascript-localstorage-with-ttl-expiry/
 function setWithExpiry(key, value, ttl=3600000) {
@@ -222,16 +222,28 @@ function plot_graph(data, destination) {
     );
 }
 
+function check_temp(t0){
+    if (t0 ===undefined ||isNaN(t0)||t0==NaN){
+        document.getElementById("no-values").style.display = "block";
+        throw Error("No values to process");
+    }
+}
+function check_hum(h0){
+    if (h0==undefined||h0===null||isNaN(h0)||!(parseInt(h0)>=0 && parseInt(h0) <=100)){
+        document.getElementById("no-values").style.display = "block";
+        throw Error("No values to process");
+    }
+}
+
 document.getElementById('calculate-model').addEventListener('click', vent);
 function vent() {
     var t0 = parseFloat(document.getElementById('t0').value);
     var h0 = parseFloat(document.getElementById('h0').value);
-    if (t0 ===undefined ||t0===null||h0===undefined||h0===null){
-        document.getElementById("no-values").style.display="block";
-        throw Error("No values to process");
-    }
+    check_temp(t0);
+    check_hum(h0);    
 
     if (h0 < 70){
+        console.log("below 70")
         document.getElementById("already_reached").style.display =  "bold";
     }
 
@@ -309,6 +321,7 @@ function train(){
     };
     //optimizing and storing back
     var solution = nelderMead(fnc, JSON.parse(localStorage["constants_vent"]), {maxIterations:20});//Only change the constants slightly
+    console.log(solution);
     localStorage["constants_vent"] = JSON.stringify(solution["x"]);
 
     document.getElementById("model-trained").style.display = "block";
@@ -316,10 +329,10 @@ function train(){
 
 document.getElementById('save-settings').addEventListener('click', save_settings);
 function save_settings(){
-    localStorage['window-size'] = document.getElementById('window-size').value;
-    localStorage['room-size'] = document.getElementById('room-size').value;
-    localStorage['lat'] = document.getElementById('lat').value;
-    localStorage['lon'] = document.getElementById('long').value;
+    if (document.getElementById('window-size').value) localStorage['window-size'] = document.getElementById('window-size').value;
+    if (document.getElementById('room-size').value) localStorage['room-size'] = document.getElementById('room-size').value;
+    if (document.getElementById('lat').value) localStorage['lat'] = document.getElementById('lat').value;
+    if (document.getElementById('long').value) localStorage['lon'] = document.getElementById('long').value;
 }
 
 document.getElementById('update-button').addEventListener('click', (function(){serviceWorkerRegistration.update()}));

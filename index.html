@@ -77,9 +77,10 @@
                     </div>
                 </div>
                 <br>
-                <div class="vent ct-octave box" style="max-width: 51em"></div>
+                <div class="box" style="max-width: 52em;"><div class="vent ct-octave"></div></div>
                 <p>x-Achse: Zeit in Minuten | y-Achse: relative Luftfeuchtigkeit in %</p>
-                <h4 id="vent_time"></h4>
+                <hr>
+                <h5 class="title is-5" id="vent_time"></h5      >
 
             </div>
         </div>
@@ -126,7 +127,7 @@
         </div>
         <div class="section pages" id="page3" style="display: none;">
             <div class="container" style="max-width: 50em;">
-                    <p>Die Koordinaten können sie bspw. <strong><a href="https://www.latlong.net">hier</a></strong> bekommen</p>
+                    <p>Die Koordinaten können sie bspw. <strong><a href="https://www.latlong.net" target="_blank">hier</a></strong> bekommen</p>
                     <hr>
                     <div class="field">
                         <div class="columns is-desktop">
@@ -165,17 +166,17 @@
                 </script>
                     <div class="columns is-mobile">
                         <!-- Settings export-restore section-->
-                        <p style="margin-right: 5px;"><a href="#" class="button is-medium is-rounded is-dark" download="vent-export.json" id="export-button">Exportieren</a>
+                        <p style="margin-right: 5px;"><a href="#" class="button is-rounded is-dark" download="vent-export.json" id="export-button">Exportieren</a>
                         </p>
-                        <label for="setting-import" class="button is-medium is-rounded is-dark">Importieren</label>
+                        <label for="setting-import" class="button is-rounded is-dark">Importieren</label>
                 <input id="setting-import" type="file" accept=".json" style="display: none;"
                     onchange="const selectedFile = this.files[0];import_settings(selectedFile);">
                     </div>
                     <hr>
                     <div class="columns is-mobile">
-                        <p style="margin-right: 5px;"><a style="display: none;" href="#" class="button is-medium is-rounded is-dark" id="install-button2">App installieren</a></p>
-                        <p style="margin-right: 5px;"><a href="#" style="display: none;" class="button is-medium is-rounded is-dark" id="update-button">Update</a></p>
-                        <p><a href="#" class="button is-medium is-rounded is-dark" id="standard-button">Standard
+                        <p style="margin-right: 5px;"><a style="display: none;" href="#" class="button is-rounded is-dark" id="install-button2">App installieren</a></p>
+                        <p style="margin-right: 5px;"><a href="#" style="display: none;" class="button is-rounded is-dark" id="update-button">Update</a></p>
+                        <p><a href="#" class="button is-rounded is-dark" id="standard-button">Standard
                                 wiederherstellen</a>
                         </p>
                     </div>
