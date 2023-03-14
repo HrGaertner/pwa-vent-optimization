@@ -21,6 +21,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+        with:
+          ref: development
 
       - name: Setup Node
         uses: actions/setup-node@v1
