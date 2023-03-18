@@ -43,7 +43,7 @@ if (localStorage["room-size"] === undefined || localStorage["window-size"] === u
     menu.call(document.getElementById("3"));
 }
 
-if (localStorage["constants_vent"] === null){
+if (localStorage["constants_vent"] === null || localStorage["constants_vent"] === undefined){
     set_defaults();
 }
 
@@ -95,15 +95,15 @@ function toggle_element_vis(elem){
     }
 }
 
-function fetch_met_no_and_cache(){ //To fetch the weather data from the internet
+async function fetch_met_no_and_cache(){ //To fetch the weather data from the internet
     if (! localStorage.getItem("lat") || !localStorage.getItem("lon")){
-        document.getElementById("weather-missing").style.display="block";
+        document.getElementById("weather-missing").style.display = "block";
         throw new Error("Can not get weather data!")
     }
     var lat = localStorage["lat"];
     var lon = localStorage["lon"];
 
-    fetch('https://api.met.no/weatherapi/locationforecast/2.0/compact?lat='+lat+'&lon='+lon).then(response => {return response.json()})
+    await fetch('https://api.met.no/weatherapi/locationforecast/2.0/compact?lat='+lat+'&lon='+lon).then(response => {return response.json()})
     .then(response => {
         var result = response["properties"]["timeseries"]
         var last_difference = Date.now();
@@ -124,10 +124,10 @@ function fetch_met_no_and_cache(){ //To fetch the weather data from the internet
 }
 
 
-document.getElementById("t_out").addEventListener("change", (function(){localStorage['t_out'] = this.value}))
-document.getElementById("h_out").addEventListener("change", (function(){setWithExpiry('h_out', this.value)}));
-document.getElementById("t_out1").addEventListener("change", (function(){localStorage['t_out'] = this.value}))
-document.getElementById("h_out1").addEventListener("change", (function(){setWithExpiry('h_out', this.value)}));
+document.getElementById("t_out").addEventListener("change", (function(){check_temp(this.value); localStorage['t_out'] = this.value}))
+document.getElementById("h_out").addEventListener("change", (function(){check_hum(this.value); setWithExpiry('h_out', this.value)}));
+document.getElementById("t_out1").addEventListener("change", (function(){check_temp(this.value); localStorage['t_out'] = this.value}))
+document.getElementById("h_out1").addEventListener("change", (function(){check_hum(this.value); setWithExpiry('h_out', this.value)}));
 //To comply with the terms of met.no one has to cache the values to reduce load on their servers. The following two function do this while assuring to get new data if necessary
 //The concept of the following two function comes from https://www.sohamkamani.com/blog/javascript-localstorage-with-ttl-expiry/
 function setWithExpiry(key, value, ttl=3600000) {
@@ -142,11 +142,13 @@ function setWithExpiry(key, value, ttl=3600000) {
 	localStorage.setItem(key, JSON.stringify(item))
 }
 
-function get_weather_data() {
+async function get_weather_data() {
 	const itemStr = localStorage.getItem("h_out")
 	// if the item doesn't exist, return null
 	if (!itemStr) {
-		fetch_met_no_and_cache()
+		await fetch_met_no_and_cache()
+
+	    const itemStr = localStorage.getItem("h_out")
         return;
 	}
 	const item = JSON.parse(itemStr)
@@ -157,7 +159,7 @@ function get_weather_data() {
 		// and return null
 		localStorage.removeItem("h_out")
         localStorage.removeItem("t_out")
-		fetch_met_no_and_cache();
+		await fetch_met_no_and_cache();
 	}
 	return parseFloat(item.value)
 }
@@ -222,20 +224,32 @@ function plot_graph(data, destination) {
     );
 }
 
-document.getElementById('calculate-model').addEventListener('click', vent);
-function vent() {
-    var t0 = parseFloat(document.getElementById('t0').value);
-    var h0 = parseFloat(document.getElementById('h0').value);
-    if (t0 ===undefined ||t0===null||h0===undefined||h0===null){
-        document.getElementById("no-values").style.display="block";
+function check_temp(t0){
+    if (t0 ===undefined ||isNaN(t0)||t0==NaN){
+        document.getElementById("no-values").style.display = "block";
         throw Error("No values to process");
     }
+}
+function check_hum(h0){
+    if (h0==undefined||h0===null||isNaN(h0)||!(parseInt(h0)>=0 && parseInt(h0) <=100)){
+        document.getElementById("no-values").style.display = "block";
+        throw Error("No values to process");
+    }
+}
+
+document.getElementById('calculate-model').addEventListener('click', vent);
+async function vent() {
+    var t0 = parseFloat(document.getElementById('t0').value);
+    var h0 = parseFloat(document.getElementById('h0').value);
+    check_temp(t0);
+    check_hum(h0);    
 
     if (h0 < 70){
+        console.log("below 70")
         document.getElementById("already_reached").style.display =  "bold";
     }
 
-    var h_out = get_weather_data()
+    var h_out = await get_weather_data()
 
     //plotting the graph
     var func = humidity_over_time_vent(h0, t0, parseFloat(localStorage["t_out"]), h_out, JSON.parse(localStorage["constants_vent"]));
@@ -287,7 +301,7 @@ function new_datapoint(){//function to add a new datapoint input to the train pa
 }
 
 document.getElementById('train_model').addEventListener('click', train);
-function train(){
+async function train(){
     //getting the data from the inputs
     var temperature = document.getElementById("T_0").value;
     var humidity = [];
@@ -298,9 +312,10 @@ function train(){
         local_time.push(datapoint.childNodes[1].childNodes[0].childNodes[0].value);
         humidity.push(datapoint.childNodes[3].childNodes[0].childNodes[0].value);
     }
+    await get_weather_data();
 
     var fnc = function(cons){//sum of error function
-        var model_prediction = humidity_over_time_vent(humidity[0], temperature, localStorage["t_out"], get_weather_data(), cons);
+        var model_prediction = humidity_over_time_vent(humidity[0], temperature, localStorage["t_out"], JSON.parse(localStorage["h_out"])["value"], cons);
         var sum = 0
         for (var i = 0; i < humidity.length; i++){
             sum += (model_prediction(local_time[i])-humidity[i])**2;
@@ -308,18 +323,16 @@ function train(){
         return sum
     };
     //optimizing and storing back
-    var solution = nelderMead(fnc, JSON.parse(localStorage["constants_vent"]), {maxIterations:20});//Only change the constants slightly
-    localStorage["constants_vent"] = JSON.stringify(solution["x"]);
-
+    localStorage["constants_vent"] = JSON.stringify(nelderMead(fnc, JSON.parse(localStorage["constants_vent"]), {maxIterations:15})["x"]);//Only change the constants slightly
     document.getElementById("model-trained").style.display = "block";
 }
 
 document.getElementById('save-settings').addEventListener('click', save_settings);
 function save_settings(){
-    localStorage['window-size'] = document.getElementById('window-size').value;
-    localStorage['room-size'] = document.getElementById('room-size').value;
-    localStorage['lat'] = document.getElementById('lat').value;
-    localStorage['lon'] = document.getElementById('long').value;
+    if (document.getElementById('window-size').value) localStorage['window-size'] = document.getElementById('window-size').value;
+    if (document.getElementById('room-size').value) localStorage['room-size'] = document.getElementById('room-size').value;
+    if (document.getElementById('lat').value) localStorage['lat'] = document.getElementById('lat').value;
+    if (document.getElementById('long').value) localStorage['lon'] = document.getElementById('long').value;
 }
 
 document.getElementById('update-button').addEventListener('click', (function(){serviceWorkerRegistration.update()}));
