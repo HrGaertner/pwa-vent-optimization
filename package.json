@@ -17,7 +17,7 @@
     "test": "eslint ."
   },
   "devDependencies": {
-    "eslint": "^8.48.0",
+    "eslint": "^8.51.0",
     "sass": "^1.65.1",
     "vite": "^4.4.9",
     "vite-plugin-pwa": "^0.16.4"
