@@ -8,7 +8,7 @@
   "dependencies": {
     "bulma": "^0.9.4",
     "chartist": "^1.3.0",
-    "fmin": "^0.0.2"
+    "fmin": "^0.0.4"
   },
   "scripts": {
     "dev": "vite --host",
