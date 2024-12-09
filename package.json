@@ -20,6 +20,6 @@
     "eslint": "^8.54.0",
     "sass": "^1.65.1",
     "vite": "^4.5.5",
-    "vite-plugin-pwa": "^0.17.0"
+    "vite-plugin-pwa": "^0.21.1"
   }
 }
